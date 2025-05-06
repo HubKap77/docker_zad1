@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikacja Pogodowa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .weather-form {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        select, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .weather-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9f7ef;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-form">
+        <h1>Aplikacja Pogodowa</h1>
+        <p>Autor: Hubert Kaproń</p>
+        <p>Port: 5001</p>
+
+        <form method="POST" action="/get_weather">
+            <label for="country">Kraj:</label>
+            <select name="country" id="country" required>
+                <option value="">-- Wybierz kraj --</option>
+                {% for country in countries %}
+                    <option value="{{ country }}">{{ country }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="city">Miasto:</label>
+            <select name="city" id="city" required disabled>
+                <option value="">-- Najpierw wybierz kraj --</option>
+            </select>
+
+            <button type="submit">Sprawdź pogodę</button>
+        </form>
+    </div>
+
+    {% if weather %}
+<div class="weather-info">
+    <h2>Pogoda w {{ weather.city }}, {{ weather.country }}</h2>
+    {% if weather.temperature != 'B/d' %}
+        <p><strong>Temperatura:</strong> {{ weather.temperature }}</p>
+        <p><strong>Warunki:</strong> {{ weather.conditions }}</p>
+        <p><strong>Wilgotność:</strong> {{ weather.humidity }}</p>
+    {% else %}
+        <p class="error">Błąd: {{ weather.conditions }}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+    <script>
+        document.getElementById('country').addEventListener('change', function() {
+            const country = this.value;
+            const citySelect = document.getElementById('city');
+
+            if (country) {
+                fetch('/get_cities/' + country)
+                    .then(response => response.json())
+                    .then(data => {
+                        citySelect.innerHTML = '';
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = '-- Wybierz miasto --';
+                        citySelect.appendChild(defaultOption);
+
+                        data.cities.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city;
+                            option.textContent = city;
+                            citySelect.appendChild(option);
+                        });
+                        citySelect.disabled = false;
+                    });
+            } else {
+                citySelect.innerHTML = '<option value="">-- Najpierw wybierz kraj --</option>';
+                citySelect.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>

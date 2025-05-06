@@ -1,0 +1,25 @@
+FROM python:3.10-slim as builder
+LABEL authors="Hubert Kaproń <s99565@pollub.edu.pl>"
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+FROM python:3.10-slim
+LABEL authors="Hubert Kaproń <s99565@pollub.edu.pl>"
+
+WORKDIR /app
+
+COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app/requirements.txt .
+
+COPY templates/ ./templates/
+COPY app.py .
+
+ENV PATH=/root/.local/bin:$PATH
+
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:5001/ || exit 1
+
+EXPOSE 5001
+CMD ["python", "app.py"]
