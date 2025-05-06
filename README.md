@@ -16,5 +16,7 @@ lub docker desktop
 
 http://localhost:5001
 
+docker inspect weather-app
 
+do sprawdzenia warstw
 
