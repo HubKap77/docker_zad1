@@ -1,8 +1,5 @@
 ##docker_zad1
-
-Python: 3.10 
-Flask: 2.x 
-Docker: 24.x (
+Narzędzia: Python: 3.10, Flask: 2.x, Docker: 24.x
 
 Aplikacja jest na porcie 5001
 Komendy:
